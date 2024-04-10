@@ -1,0 +1,10 @@
+{
+  "namespace": "workshop.kafka.avro.model",
+  "type": "record",
+  "name": "UserRecord",
+  "fields": [
+    {"name": "name", "type": "string"},
+    {"name": "age", "type": "int"}
+  ],
+  "version": 1
+}
