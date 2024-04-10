@@ -45,6 +45,7 @@ public class JsonSerializationTest {
 
     @AfterEach
     void tearDown() {
+        kafka.deleteTopic(JsonProducer.TOPIC);
         kafka.stop();
     }
 

@@ -46,6 +46,8 @@ public class DeadLetterQueueTest {
 
     @AfterEach
     void tearDown() {
+        kafka.deleteTopic(JsonProducer.TOPIC);
+        kafka.deleteTopic(DeadLetterProducer.TOPIC);
         kafka.stop();
     }
 
