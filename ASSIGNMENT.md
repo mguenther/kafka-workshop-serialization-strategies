@@ -64,7 +64,7 @@ Why might you choose a serialization format that supports schema evolution?
 
 The class `JsonProducer` is a minimal bootstrap of a Kafka Producer for our domain object `User`. Sadly it's missing the capability to serialize the object.
 `
-1. Implement a custom `Serializer`, that is able to serialize objects of the type `User` to `byte[]` and wire it with the `JsonProducer`. You are finished whenever the `JsonProducerTest.serialization` test is green.
+1. Implement a custom `Serializer`, that is able to serialize objects of the type `User` to `byte[]` and wire it with the `JsonProducer`. You are finished whenever the `JsonSerializationTest.serialization` test is green.
 
 2. Implement a custom `Deserializer`, that is able to read the produced messages and returns the `User` object. The goal is for the `JsonSerializationTest.deserialization` test to run successfully. If you already finished Task 2.1 - the `JsonSerializationTest.serdes` test should also be green.
 
