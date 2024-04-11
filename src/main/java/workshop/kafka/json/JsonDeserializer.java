@@ -15,7 +15,7 @@ public class JsonDeserializer implements Deserializer<User> {
         try {
             return mapper.readValue(data, User.class);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new JsonDeserializationException(data, e.getMessage(), e);
         }
     }
 }

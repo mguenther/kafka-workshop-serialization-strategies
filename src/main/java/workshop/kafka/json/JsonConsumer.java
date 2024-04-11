@@ -4,6 +4,7 @@ import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
+import org.apache.kafka.common.errors.RecordDeserializationException;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import workshop.kafka.model.User;
 
@@ -23,12 +24,15 @@ public class JsonConsumer implements Runnable {
 
     private final KafkaConsumer<String, User> consumer;
 
+    private final DeadLetterProducer deadLetterProducer;
+
     private boolean keepRunning = true;
 
     public JsonConsumer(String bootstrapServers) {
         consumer = initializeConsumer(bootstrapServers);
         consumer.subscribe(Collections.singletonList(TOPIC));
         observedRecords = new ArrayList<>();
+        deadLetterProducer = new DeadLetterProducer(bootstrapServers);
     }
 
     private static KafkaConsumer<String, User> initializeConsumer(String bootstrapServers) {
@@ -45,8 +49,16 @@ public class JsonConsumer implements Runnable {
 
     public void run() {
         while (keepRunning) {
-            ConsumerRecords<String, User> records = consumer.poll(Duration.ofMillis(200));
-            records.forEach(observedRecords::add);
+            try {
+                ConsumerRecords<String, User> records = consumer.poll(Duration.ofMillis(200));
+                records.forEach(observedRecords::add);
+            } catch ( RecordDeserializationException ex ) {
+                consumer.seek(ex.topicPartition(), ex.offset() + 1);
+
+                if ( ex.getCause() instanceof JsonDeserializationException ) {
+                    deadLetterProducer.publishDeadLetter(((JsonDeserializationException) ex.getCause()).getFaultyMessageString());
+                }
+            }
         }
     }
 
